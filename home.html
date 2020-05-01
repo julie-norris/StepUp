@@ -1,0 +1,129 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<head>
+	<style>
+.dropbtn {
+  background-color: #4CAF50;
+  color: white;
+  padding: 16px;
+  font-size: 16px;
+  border: none;
+}
+
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.dropdown-content {
+  display: none;
+  position: absolute;
+  background-color: #f1f1f1;
+  min-width: 160px;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  z-index: 1;
+}
+
+.dropdown-content a {
+  color: black;
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+}
+
+.dropdown-content a:hover {background-color: #ddd;}
+
+.dropdown:hover .dropdown-content {display: block;}
+
+.dropdown:hover .dropbtn {background-color: #3e8e41;}
+</style>
+</head>
+<body>
+<div class="container-fluid orange form-horizontal">
+    <h2>Please register or login to use StepUp</h2>
+
+    <form action="/" method="POST">
+
+        <div>
+            <div>
+            <h3> New Users Register Here: </h3>
+                <label for="inputEmail" class="col-sm-2 control-label">Email:
+                    <input type="email" class="form-control" id="inputEmail" name="email" placeholder="Email"required>
+                </label>
+            </div>
+            <div class="form-group">
+                <label for="inputPassword" class="col-sm-2 control-label">Password:
+                    <input type="password" class="form-control" id="inputPassword" name="password" placeholder="Password"required>
+                </label>
+            </div>
+            <div>
+                <label for="inputFirst" class="col-sm-6 control-label">First Name:
+                    <input type="text" class="form-control" id="First" name="fname" placeholder="Name" required>
+                </label>
+                <label for="inputLast" class="col-sm-6 control-label">Last Name:
+                    <input type="text" class="form-control" id="First" name="lname" placeholder="Last Name" required>
+                </label>
+            </div>
+            <div>
+                <label for="inputPhone" class="col-sm-4 control-label"><br>Phone Number:
+                    <input type="tel" class="form-control" id="Phone" name="phone_number" placeholder="555-555-5555" required>
+                </label>
+            </div>
+            <div>
+                <label for="inputLicense" class="col-sm-4 control-label">
+                	<br>Name of Organization Providing Intervention Services:
+                    <input type="text" class="form-control" id="Organization" name="provider_organization" required>
+                </label>
+            </div>
+        </div>
+        <div>
+            <label class="col-sm-5 control-label"> 
+            <input type="submit" value="Registration">
+        </div>
+
+    </form>
+</div>
+    <div class="orange">
+    <h3>Returning Users Login Here</h3>
+    <form action="/login_process" method="POST">
+
+        <div>
+            <label>Email:
+                <input type="email" name="email" required>
+            </label>
+            <br>
+        </div>
+
+        <div>
+            <label>Password:</label>
+                <input type="password" name="password" required>
+            </label>
+            <br>
+        </div>
+        <label> Select Your Organization From the Dropdown Menu:</label>
+        <div class="dropdown">
+  				<button class="dropbtn">Dropdown</button>
+ 				<div class="dropdown-content">
+    			<a href="#">WCCUSD</a>
+    			<a href="#">Link 2</a>
+    			<a href="#">Link 3</a>
+    			<br>
+    			<br>
+    			<br>
+  		</div>
+</div>
+
+        <div>
+        	<br>
+        	<br>
+            <input type="submit" value="Log In">
+            <br>
+            <br>
+        </div>
+
+    </form>
+</div>
+</body>
+
+{% endblock %}
