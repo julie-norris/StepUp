@@ -73,7 +73,7 @@ class StudentGroups(db.Model):
                       db.ForeignKey(students.student_number))
   provider_id = db.Column(db.integer,
                       db.ForeignKey(providers.provider_id))
-  group_name = db.Column(db.string(64), nullable = False)
+  group_name = db.Column(db.string(64), nullable = True)
 
 class InterventionTypes(db.Model):
     __tablename__ = "intervention_type"
@@ -100,6 +100,26 @@ class CurrentIntervention (db.Model):
                           db.ForeignKey(providers.provider_id))
     group_id =db.Column(db.integer,
                                     db.ForeignKey(student_groups.group_id))
+
+
+
+#########################################################################
+#Helper Functions
+
+def connect_to_db(app, database_uri='postgresql:///stepup'):
+
+    app.config['SQLALCHEMY_DATABASE_URI'] = database_uri
+    # app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+    db.app = app
+    db.init_app(app)
+
+if __name__ == "__main__":
+
+    from server import app
+    connect_to_db(app)
+
+    db.create_all()
+
 
 
 

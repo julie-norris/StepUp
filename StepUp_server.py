@@ -34,12 +34,12 @@ def register():
     
 
     #match = re.match(r'^[a-zA-Z0-9 -]{5,9}$', license_number)
-
+"""
     #if not match:
     #    flash("Invalid license number. Try again.")
     #    return redirect("/register")
 
-    user = Person.query.filter_by(email=email).first()
+   """ user = Person.query.filter_by(email=email).first()
 
     if user:
         flash("You have already registered! Please log-in!")
@@ -67,7 +67,7 @@ def register():
         return redirect("/driver")
     else:
         return redirect("/rider")
-
+"""
 @app.route("/add_student")
 def add_student(): 
 	"""user can add a student to an existing group or add a student to a new group"""
