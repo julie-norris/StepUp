@@ -1,66 +1,6 @@
-from flask_sqlalchemy import flask_sqlalchemy
+from flask_sqlalchemy import SQLAlchemy
 
 db = SQLAlchemy()
-
-class User(db.Model):
-	"""stores information to identify user"""
-	__tablename__ = "users"
-
-	user_id = db.Column(db.Integer,
-											autoincrement = True
-											primary_key = True) # auto-increment
-	
-	email = db.Column(db.string(64), nullable=False)
-	password = db.Column(db.string(64), nullable=False)
-	fname = db.Column(db.string(64), nullable=False)
-	lname = db.Column(db.string(64), nullable=False)
-	user_type = db.Column(db.string(20), nullable=False)
-	organization = db.Column(db.string(64), nullable=False)
-	provider_id= db.Column(db.integer, db.ForeignKey(providers.provider_id))
-
-
-class InterventionCycle (db.Model):
-	"""stores all cycles of intervention provided to students"""
-	__tablename__ = "cycles"
-
-
-	intervention_id = db.Column(db.Integer,
-															autoincrement = True
-															primary_key = True)
-
-	start_date = db.Column(db.DateTime, nullable=False)
-	end_date = db.Column(db.DateTime, nullable=False)
-	goal = db.Column(db.string(120), nullable=False)
-	intervention_type = db.Column(db.string(20), nullable=False)
-	goal = db.Column(db.string(240), nullable=True)
-	summative_data = db.Column(db.numeric(6,2), nullable-False)
-	comment = db.Column(db.string(120), nullable=False)
-	grade_level = db.Column(db.Integer, nullable=False)
-	student_id = db.Column(db.integer,
-												 db.ForeignKey(students.student_number)) # inline relationship (many-to-one)
-
-
-class Student(db.Model):
-	"""stores information of students receiving interventions"""
-	__tablename__ = "students" 
-
-	student_number = db.Column(db.Integer,
-														primary_key=True)
-	stu_fname = db.Column(db.string(20), nullable=False)
-	stu_lname = db.Column(db.string(20), nullable=False)
-	previous_intervention = db.Column(db.integer,
-																		db.ForeignKey(cycles.intervention_id)) # one-to-many
-	gpa = db.column(db.float, nullable=True)
-	schoolid = db.column(db.integer, nullable=False)
-	teacher = db.Colum(db.string(20), nullable=True)
-	guardian = db.Column(db.string(64), nullable=True)
-	SchoolAdmin = db.Column(db.string(64), nullable=True)
-	Student_email = db.Column(db.string(64), nullable=True)
-	isSpEd = db.Column(db.string(5), nullable=True)
-	isEL = db.Column(db.string(5), nullable=True)
-	isHomeless = db.Column(db.string(5), nullable=True)
-	isFosterYouth = db.Column(db.string(5), nullable=True)
-
 
 
 class ProviderOrg(db.Model):
@@ -68,43 +8,110 @@ class ProviderOrg(db.Model):
 	__tablename__ = "providers" 
 
 	provider_id = db.Column(db.Integer,
-														autoincrement = True
-														primary_key=True)
-	organization_name = db.Column(db.string(64), nullable=False)
-	provider_name  = db.Column(db.string(64), nullable=True)
-	provider_email = db.Column(db.string(64), nullable=True)
-	organization_phone = db.Column(db.string(20), nullable=False)
+												autoincrement = True,
+												primary_key=True)
+	organization_name = db.Column(db.String(64), nullable=False)
+	provider_name  = db.Column(db.String(64), nullable=True)
+	provider_email = db.Column(db.String(64), nullable=True)
+	organization_phone = db.Column(db.String(20), nullable=False)
+	# realtionship established with provider; one provider could be realated to many users
+	users = db.relationship("User", back_populates="provider")
+
+
+class User(db.Model):
+	"""stores information to identify user"""
+	__tablename__ = "users"
+
+	user_id = db.Column(db.Integer,
+												autoincrement = True,
+												primary_key=True)
+	email = db.Column(db.String(64), nullable=False)
+	password = db.Column(db.String(64), nullable=False)
+	fname = db.Column(db.String(64), nullable=False)
+	lname = db.Column(db.String(64), nullable=False)
+	user_type = db.Column(db.String(20), nullable=False)
+	organization = db.Column(db.String(64), nullable=False)
+	id_provider= db.Column(db.Integer, 
+								db.ForeignKey('providers.provider_id'))
+	
+	#establishing a many to one relationship; one provider could have relationship with many providers /
+	#(ie. work at many schools)
+	provider = db.relationship("Provider", back_populates="users")
+
+class InterventionCycle (db.Model):
+	"""stores all cycles of intervention provided to students"""
+	__tablename__ = "cycles"
+
+
+	intervention_id = db.Column(db.Integer,
+												autoincrement = True,
+												primary_key=True)
+
+	start_date = db.Column(db.DateTime, nullable=False)
+	end_date = db.Column(db.DateTime, nullable=False)
+	goal = db.Column(db.String(120), nullable=False)
+	intervention_type = db.Column(db.String(20), nullable=False)
+	goal = db.Column(db.String(240), nullable=True)
+	summative_data = db.Column(db.Numeric(6,2), nullable=False)
+	comment = db.Column(db.String(120), nullable=False)
+	grade_level = db.Column(db.Integer, nullable=False)
+	student_id = db.Column(db.Integer,
+												 db.ForeignKey('students.student_number')) # inline relationship (many-to-one)
+
+
+class Student(db.Model):
+	"""stores information of students receiving interventions"""
+	__tablename__ = "students" 
+
+	student_number = db.Column(db.Integer,
+												primary_key=True)
+	stu_fname = db.Column(db.String(20), nullable=False)
+	stu_lname = db.Column(db.String(20), nullable=False)
+	previous_intervention = db.Column(db.Integer,
+																		db.ForeignKey('cycles.intervention_id')) # one-to-many
+	gpa = db.Column(db.Numeric(6,2), nullable=True)
+	schoolid = db.Column(db.Integer, nullable=False)
+	teacher = db.Column(db.String(20), nullable=True)
+	guardian = db.Column(db.String(64), nullable=True)
+	SchoolAdmin = db.Column(db.String(64), nullable=True)
+	Student_email = db.Column(db.String(64), nullable=True)
+	isSpEd = db.Column(db.String(5), nullable=True)
+	isEL = db.Column(db.String(5), nullable=True)
+	isHomeless = db.Column(db.String(5), nullable=True)
+	isFosterYouth = db.Column(db.String(5), nullable=True)
+
+
 
 
 
 class StudentGroup(db.Model):
-		"""stores information about students in a group receiving the same intervnetion"""
-	__tablename__ = "student_groups"  
+	"""stores information about students in a group receiving the same intervnetion"""
+	__tablename__ = "student_groups"
 
 	group_id = db.Column(db.Integer,
 												autoincrement = True,
 												primary_key=True)
-	student_number = db.Column(db.integer,
-											db.ForeignKey(students.student_number))
-	group_current_intervention_id = db.Column(db.integer,
-											db.ForeignKey(current_interventions.current_id))
-	group_name = db.Column(db.string(64), nullable = True)
+	student_number = db.Column(db.Integer,
+											db.ForeignKey('students.student_number'))
+	group_current_intervention_id = db.Column(db.Integer,
+											db.ForeignKey('current_interventions.current_id'))
+	group_name = db.Column(db.String(64), nullable = True)
 
 
 class CurrentIntervention (db.Model):
-		__tablename__ = "current_interventions"
+	__tablename__ = "current_interventions"
 
-		current_id = db.Column(db.Integer,
+	current_id = db.Column(db.Integer,
 												autoincrement = True,
 												primary_key=True)
-		current_intervention_id = db.Column(db.integer,
-											db.ForeignKey(cycles.intervention_id))
-		formative_data = db.Column(db.numeric(6,2),
+	current_intervention_id = db.Column(db.Integer,
+											db.ForeignKey('cycles.intervention_id'))
+	formative_data = db.Column(db.Numeric(6,2),
 																nullable=False)
-		current_provider_id =db.Column(db.integer,
-													db.ForeignKey(providers.provider_id))
-		current_group_id =db.Column(db.integer,
-													db.ForeignKey(student_groups.group_id))
+	current_provider_id =db.Column(db.Integer,
+													db.ForeignKey('providers.provider_id'))
+	current_group_id =db.Column(db.Integer,
+													db.ForeignKey('student_groups.group_id'))
 
 
 

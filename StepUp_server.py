@@ -5,15 +5,15 @@ import requests
 import json
 from datetime import datetime, time
 from time import sleep
-from twilio.rest import Client
-from twilio.twiml.messaging_response import MessagingResponse
+#from twilio.rest import Client
+#from twilio.twiml.messaging_response import MessagingResponse
 import os
 
 #import cx_Oracle
-import pandas as pd
+import pandas as pdS
 from pandas import ExcelFile
 from pandas import ExcelWriter
-from model import db, connect_to_db, User, IntervenionCycle, Student, ProviderOrg, StudentGroup, CurrentIntervention
+from model import db, connect_to_db, User, InterventionCycle, Student, ProviderOrg, StudentGroup, CurrentIntervention
 #from flask_debugtoolbar import DebugToolbarExtension
 #con_str = 'psnavigator/navigate@xxxxxxx/xxxx'
 #con = cx_Oracle.connect(con_str)
@@ -114,7 +114,7 @@ def notifications():
 
 
 if __name__ == "__main__":
-	#connect_to_db(app)
+	connect_to_db(app)
 	app.run(host='127.0.0.1')
 
 
