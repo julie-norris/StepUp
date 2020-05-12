@@ -2,7 +2,7 @@ from flask_sqlalchemy import flask_sqlalchemy
 
 db = SQLAlchemy()
 
-class Users(db.Model):
+class User(db.Model):
 	"""stores information to identify user"""
 	__tablename__ = "users"
 
@@ -11,12 +11,15 @@ class Users(db.Model):
 											primary_key = True) # auto-increment
 	
 	email = db.Column(db.string(64), nullable=False)
+	password = db.Column(db.string(64), nullable=False)
+	fname = db.Column(db.string(64), nullable=False)
+	lname = db.Column(db.string(64), nullable=False)
 	user_type = db.Column(db.string(20), nullable=False)
 	organization = db.Column(db.string(64), nullable=False)
 	provider_id= db.Column(db.integer, db.ForeignKey(providers.provider_id))
 
 
-class InterventionCycles (db.Model):
+class InterventionCycle (db.Model):
 	"""stores all cycles of intervention provided to students"""
 	__tablename__ = "cycles"
 
@@ -37,7 +40,7 @@ class InterventionCycles (db.Model):
 												 db.ForeignKey(students.student_number)) # inline relationship (many-to-one)
 
 
-class Students(db.Model):
+class Student(db.Model):
 	"""stores information of students receiving interventions"""
 	__tablename__ = "students" 
 
@@ -60,7 +63,7 @@ class Students(db.Model):
 
 
 
-class ProviderOrgs(db.Model):
+class ProviderOrg(db.Model):
 	"""stores information about intervention providers"""
 	__tablename__ = "providers" 
 
@@ -74,22 +77,22 @@ class ProviderOrgs(db.Model):
 
 
 
-class StudentGroups(db.Model):
+class StudentGroup(db.Model):
 		"""stores information about students in a group receiving the same intervnetion"""
-	__tablename__ = "student_group"  
-	
+	__tablename__ = "student_groups"  
+
 	group_id = db.Column(db.Integer,
 												autoincrement = True,
 												primary_key=True)
 	student_number = db.Column(db.integer,
 											db.ForeignKey(students.student_number))
 	group_current_intervention_id = db.Column(db.integer,
-											db.ForeignKey(current_intervention.current_id))
+											db.ForeignKey(current_interventions.current_id))
 	group_name = db.Column(db.string(64), nullable = True)
 
 
 class CurrentIntervention (db.Model):
-		__tablename__ = "current_intervention"
+		__tablename__ = "current_interventions"
 
 		current_id = db.Column(db.Integer,
 												autoincrement = True,
@@ -117,10 +120,9 @@ def connect_to_db(app, database_uri='postgresql:///mtss'):
 
 if __name__ == "__main__":
 
-		from server import app
-		connect_to_db(app)
-
-		db.create_all()
+	from server import app
+	connect_to_db(app)
+	db.create_all()
 
 
 

@@ -3,10 +3,17 @@ from jinja2 import StrictUndefined
 import io
 import requests
 import json
+from datetime import datetime, time
+from time import sleep
+from twilio.rest import Client
+from twilio.twiml.messaging_response import MessagingResponse
+import os
+
 #import cx_Oracle
 import pandas as pd
 from pandas import ExcelFile
 from pandas import ExcelWriter
+from model import db, connect_to_db, User, IntervenionCycle, Student, ProviderOrg, StudentGroup, CurrentIntervention
 #from flask_debugtoolbar import DebugToolbarExtension
 #con_str = 'psnavigator/navigate@xxxxxxx/xxxx'
 #con = cx_Oracle.connect(con_str)
@@ -30,35 +37,39 @@ def register():
 	password = request.form["password"]
 	fname = request.form["fname"]
 	lname = request.form["lname"]
-	phone = request.form["phone_number"]
+	user_type = request.form["user_type"]
+	#phone = request.form["phone_number"]
 	
 
-	#match = re.match(r'^[a-zA-Z0-9 -]{5,9}$', license_number)
-"""
-	#if not match:
-	#    flash("Invalid license number. Try again.")
-	#    return redirect("/register")
+	match = re.match(r'^(?:(?:\+?1\s*(?:[.-]\s*)?)?(?:\(\s*([2-9]1[02-9]|[2-9][02-8]1|[2-9][02-8][02-9])\s*\)|([2-9]1[02-9]|[2-9][02-8]1|[2-9][02-8][02-9]))\s*(?:[.-]\s*)?)?([2-9]1[02-9]|[2-9][02-9]1|[2-9][02-9]{2})\s*(?:[.-]\s*)?([0-9]{4})(?:\s*(?:#|x\.?|ext\.?|extension)\s*(\d+))?$', 
+							phone_number)
 
-   """ 
-	#user = Person.query.filter_by(email=email).first()
+	if not match:
+	    flash("Invalid phone number. Try again.")
+	    return redirect("/register")
 
-"""	if user:
+   
+	user = User.query.filter_by(email=email).first()
+
+	if user:
 		flash("You have already registered! Please log-in!")
-		return redirect("/login")
+		#return redirect("/login") not necessary because register and login are in the
+		#menu bar. no redirect required.
 
 	else:    
-		user = Person(
+		user = User(
 			email=email,
 			password=password,
 			fname=fname,
 			lname=lname,
-			phone=phone, 
+			user_type = user_type,
+			#phone=phone, 
 			organization=provider_organization
 			)
 
 	db.session.add(user)
 	db.session.commit()
-
+"""
 #  NEED SOMETHING HERE TO MAKE SURE THEY ARE LOGGED IN -- IS THIS ENOUGH:
 	session["user_id"] = user.user_id 
 	
