@@ -15,7 +15,7 @@ from pandas import ExcelFile
 from pandas import ExcelWriter
 from model import db, connect_to_db, User, InterventionCycle, Student, ProviderOrg, StudentGroup, CurrentIntervention
 from flask_debugtoolbar import DebugToolbarExtension
-con_str = 'psnavigator/navigate@172.21.170.234/CA528'
+con_str = 'psnavigator/xxxxxxx@xxxxxxxxxx/CA528'
 con = cx_Oracle.connect(con_str)
 c = con.cursor()
 app = Flask(__name__)
