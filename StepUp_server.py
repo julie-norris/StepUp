@@ -9,15 +9,15 @@ from time import sleep
 #from twilio.twiml.messaging_response import MessagingResponse
 import os
 
-#import cx_Oracle
+import cx_Oracle
 import pandas as pdS
 from pandas import ExcelFile
 from pandas import ExcelWriter
 from model import db, connect_to_db, User, InterventionCycle, Student, ProviderOrg, StudentGroup, CurrentIntervention
 #from flask_debugtoolbar import DebugToolbarExtension
-#con_str = 'psnavigator/navigate@xxxxxxx/xxxx'
-#con = cx_Oracle.connect(con_str)
-#c = con.cursor()
+con_str = 'psnavigator/navigate@172.21.170.234/CA528'
+con = cx_Oracle.connect(con_str)
+c = con.cursor()
 app = Flask(__name__)
 app.jinja_env.undefined = StrictUndefined
 """login and/or register. users must be associated with an organization"""
@@ -38,23 +38,13 @@ def register():
 	fname = request.form["fname"]
 	lname = request.form["lname"]
 	user_type = request.form["user_type"]
-	#phone = request.form["phone_number"]
-	
-
-	match = re.match(r'^(?:(?:\+?1\s*(?:[.-]\s*)?)?(?:\(\s*([2-9]1[02-9]|[2-9][02-8]1|[2-9][02-8][02-9])\s*\)|([2-9]1[02-9]|[2-9][02-8]1|[2-9][02-8][02-9]))\s*(?:[.-]\s*)?)?([2-9]1[02-9]|[2-9][02-9]1|[2-9][02-9]{2})\s*(?:[.-]\s*)?([0-9]{4})(?:\s*(?:#|x\.?|ext\.?|extension)\s*(\d+))?$', 
-							phone_number)
-
-	if not match:
-	    flash("Invalid phone number. Try again.")
-	    return redirect("/register")
 
    
 	user = User.query.filter_by(email=email).first()
 
 	if user:
 		flash("You have already registered! Please log-in!")
-		#return redirect("/login") not necessary because register and login are in the
-		#menu bar. no redirect required.
+		return redirect("/login") 
 
 	else:    
 		user = User(
@@ -62,33 +52,88 @@ def register():
 			password=password,
 			fname=fname,
 			lname=lname,
-			user_type = user_type,
-			#phone=phone, 
+			user_type = user_type, 
 			organization=provider_organization
 			)
 
 	db.session.add(user)
 	db.session.commit()
-"""
-#  NEED SOMETHING HERE TO MAKE SURE THEY ARE LOGGED IN -- IS THIS ENOUGH:
+
 	session["user_id"] = user.user_id 
-	
-	flash("Thank you for registering for CarPool! You have been logged in!")
-	
-	if driver_or_rider == 'driver':
-		return redirect("/driver")
-	else:
-		return redirect("/rider")
+	return redirect("/student_groups")
 
-@app.route("/add_student")
-def add_student(): 
-	user can add a student to an existing group or add a student to a new group
+@app.route("/login")
+def login():
 
-	return render_template("add_student.html")
+	email = request.form["email"]
+    password = request.form["password"]
+
+    user = User.query.filter_by(email=email).first()
+
+    if user.password != password:
+        flash("Incorrect password")
+
+    session["user_id"] = user.user_id
+    session['logged_in'] = True
+    flash("you are logged in")
+    return render_template("/student_gropus")
+
 
 @app.route("/student_groups")
-def student_groups():
+
+def extract_student_fromSIS_fordb(): 
+
+		"""extract student info from SIS and add to StepUp DB table, Student"""
+		student = request.args.get('student')
+		(firstname, lastname)= student.split(" ")
+		
+		#test with this info and then add all other student info for model
+		query="""
+		SELECT student_number,
+		 last_name, 
+		 first_name,
+		 dob,
+		 schoolID  
+		FROM students  
+		where first_name='""" + (firstname) + """ 'AND last_name='"""+(lastname)+"""'"""
+		
+		query_results=c.execute(query)
+		#results = pd.read_sql(query,con)
+		df=pd.DataFrame(results)
+		#display student name, dob and school id for user to select
+		#onclick, add to 
+		#need to unpack df results to get info to look for student in Student table
+		student=Student.query.filter_by(student_number = student_number,
+										dob = dob)
+
+		#need to unpack results to get info to add student
+		if not student:
+			student=Student(student_number = student_number,
+										stu_fname = first_name,
+										stu_lname = last_name,
+										dob = dob,
+										schoolid = schoolID)
+			db.session.add(student)
+			db.session.commit()
+
+
+		return (results.to_json(orient='records'))	
 	
+
+def add_student_to_student_groups():
+	"""user can add a student to an existing group or add a student to a new group"""
+	student_in_group=StudentGroup.query.filter_by(student_number=student_number)
+	#if not student_in_group in StudentGroup:
+	#	group=Student()
+
+def create_current_intervention():
+
+
+
+
+
+
+	"""
 	When user logs in - the code will query student groups associated with
 	the user displaying data available for each student in a chart ie. number of sessions attended
 	number of sessions missed, interventiont type, start date, end date.
@@ -98,10 +143,10 @@ def student_groups():
 
 	return render_template("student_groups.html")
 
-
+"""
 @app.route("/notifictions")
 def notifications():
-
+"""
 	 boilerplate notifications that will be sent to relevant parties when
 	1. student attends a session
 	2. student misses a session

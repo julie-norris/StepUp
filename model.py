@@ -58,7 +58,6 @@ class InterventionCycle (db.Model):
 	student_id = db.Column(db.Integer,
 												 db.ForeignKey('students.student_number')) # inline relationship (many-to-one)
 
-
 class Student(db.Model):
 	"""stores information of students receiving interventions"""
 	__tablename__ = "students" 
@@ -82,15 +81,13 @@ class Student(db.Model):
 
 
 
-
-
 class StudentGroup(db.Model):
 	"""stores information about students in a group receiving the same intervnetion"""
 	__tablename__ = "student_groups"
 
 	group_id = db.Column(db.Integer,
-												autoincrement = True,
-												primary_key=True)
+						autoincrement = True,
+						primary_key=True)
 	student_number = db.Column(db.Integer,
 											db.ForeignKey('students.student_number'))
 	group_current_intervention_id = db.Column(db.Integer,
