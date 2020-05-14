@@ -4,7 +4,7 @@
 <head>
 	<style>
 .dropbtn {
-  background-color: #4CAF50;
+  background-color: #4caf50;
   color: white;
   padding: 16px;
   font-size: 16px;
@@ -43,7 +43,7 @@
 <div class="container-fluid orange form-horizontal">
     <h2>Please register or login to use StepUp</h2>
 
-    <form action="/" method="POST">
+    <form action="/register_new_user" method="GET">
 
         <div>
             <div>
@@ -64,7 +64,7 @@
                 <label for="inputLast" class="col-sm-6 control-label">Last Name:
                     <input type="text" class="form-control" id="Last" name="lname" placeholder="Last Name" required>
                 </label>
-            </div>s
+            </div>
             <div>
                 <label for="inputOrganization" class="col-sm-4 control-label">
                 	<br>Name of Organization Providing Intervention Services:
@@ -81,7 +81,7 @@
 </div>
     <div class="orange">
     <h3>Returning Users Login Here</h3>
-    <form action="/login_process" method="POST">
+    <form action="/student_groups" methods='GET'>
 
         <div>
             <label>Email:
@@ -112,7 +112,7 @@
         <div>
         	<br>
         	<br>
-            <input type="submit" value="Log In">
+            <input type="submit" value="login">
             <br>
             <br>
         </div>

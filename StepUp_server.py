@@ -14,10 +14,10 @@ import pandas as pdS
 from pandas import ExcelFile
 from pandas import ExcelWriter
 from model import db, connect_to_db, User, InterventionCycle, Student, ProviderOrg, StudentGroup, CurrentIntervention
-#from flask_debugtoolbar import DebugToolbarExtension
-con_str = 'psnavigator/navigate@172.21.170.234/CA528'
-con = cx_Oracle.connect(con_str)
-c = con.cursor()
+from flask_debugtoolbar import DebugToolbarExtension
+#con_str = 'psnavigator/navigate@172.21.170.234/CA528'
+#con = cx_Oracle.connect(con_str)
+#c = con.cursor()
 app = Flask(__name__)
 app.jinja_env.undefined = StrictUndefined
 """login and/or register. users must be associated with an organization"""
@@ -28,7 +28,7 @@ def home():
 
 	return render_template("home.html")
 	
-@app.route("/register_new_user")
+@app.route("/register_new_user", methods=['GET'])
 def register():
 	"""Creates a new user in the database."""
 
@@ -66,29 +66,28 @@ def register():
 def login():
 
 	email = request.form["email"]
-    password = request.form["password"]
+	password = request.form["password"]
+	user = User.query.filter_by(email=email).first()
 
-    user = User.query.filter_by(email=email).first()
+	if user.password != password:
+		flash("Incorrect password")
 
-    if user.password != password:
-        flash("Incorrect password")
-
-    session["user_id"] = user.user_id
-    session['logged_in'] = True
-    flash("you are logged in")
-    return render_template("/student_gropus")
+	session["user_id"] = user.user_id
+	session['logged_in'] = True
+	flash("you are logged in")
+	return render_template("/student_groups")
 
 
 @app.route("/student_groups")
 
 def extract_student_fromSIS_fordb(): 
 
-		"""extract student info from SIS and add to StepUp DB table, Student"""
-		student = request.args.get('student')
-		(firstname, lastname)= student.split(" ")
+	"""extract student info from SIS and add to StepUp DB table, Student"""
+	student = request.args.get('student')
+	(firstname, lastname)= student.split(" ")
 		
-		#test with this info and then add all other student info for model
-		query="""
+	#test with this info and then add all other student info for model
+	query="""
 		SELECT student_number,
 		 last_name, 
 		 first_name,
@@ -97,27 +96,27 @@ def extract_student_fromSIS_fordb():
 		FROM students  
 		where first_name='""" + (firstname) + """ 'AND last_name='"""+(lastname)+"""'"""
 		
-		query_results=c.execute(query)
-		#results = pd.read_sql(query,con)
-		df=pd.DataFrame(results)
-		#display student name, dob and school id for user to select
-		#onclick, add to 
-		#need to unpack df results to get info to look for student in Student table
-		student=Student.query.filter_by(student_number = student_number,
+	query_results=c.execute(query)
+	#results = pd.read_sql(query,con)
+	df=pd.DataFrame(results)
+	#display student name, dob and school id for user to select
+	#onclick, add to 
+	#need to unpack df results to get info to look for student in Student table
+	student=Student.query.filter_by(student_number = student_number,
 										dob = dob)
 
-		#need to unpack results to get info to add student
-		if not student:
-			student=Student(student_number = student_number,
-										stu_fname = first_name,
-										stu_lname = last_name,
-										dob = dob,
-										schoolid = schoolID)
-			db.session.add(student)
-			db.session.commit()
+	#need to unpack results to get info to add student
+	if not student:
+		student=Student(student_number = student_number,
+									stu_fname = first_name,
+									stu_lname = last_name,
+									dob = dob,
+									schoolid = schoolID)
+		db.session.add(student)
+		db.session.commit()
 
 
-		return (results.to_json(orient='records'))	
+	return (results.to_json(orient='records'))	
 	
 
 def add_student_to_student_groups():
@@ -125,37 +124,6 @@ def add_student_to_student_groups():
 	student_in_group=StudentGroup.query.filter_by(student_number=student_number)
 	#if not student_in_group in StudentGroup:
 	#	group=Student()
-
-def create_current_intervention():
-
-
-
-
-
-
-	"""
-	When user logs in - the code will query student groups associated with
-	the user displaying data available for each student in a chart ie. number of sessions attended
-	number of sessions missed, interventiont type, start date, end date.
-
-	when the student name is clicked the browser opens up a tab specific to the student
-	with graphics (?) and starting criteria, data collected durng intervention, end goal
-
-	return render_template("student_groups.html")
-
-"""
-@app.route("/notifictions")
-def notifications():
-"""
-	 boilerplate notifications that will be sent to relevant parties when
-	1. student attends a session
-	2. student misses a session
-	3. student achieves goal
-	4. student exits intervention without achieving goal
-	5. other(?)
-	
-
-	return render_template("notifications.html")"""
 
 
 if __name__ == "__main__":
